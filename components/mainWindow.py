@@ -1,24 +1,25 @@
 from PyQt6 import uic
 from PyQt6.QtCore import QEvent, QObject, Qt
-from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
 from components.rightPanel import RightPanel
 from services.consoleService import ConsoleService
 from services.fileService import FileService
+from ui.ui_mainWindow import Ui_MainWindow
 
 class MainWindow(QMainWindow):
     def __init__(self, ui_file: str):
         super().__init__()
-        self.ui = uic.loadUi(ui_file, self)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
         self.setWindowTitle("Image Sorter")
         self.resize(1200, 600)
-        self.consoleService = ConsoleService(self.textEdit)
+        self.consoleService = ConsoleService(self.ui.textEdit)
         self.fileService = FileService(self.consoleService)
         self.fileService.inputFolderChanged.connect(self.updateInputFolder)
-        self.mediaDisplay.setFileService(self.fileService)
-        self.mediaDisplay.setChildren(self.imageGallery, self.videoPlayer, self.alertFrame)
-        self.mediaDisplay.mediaLoaded.connect(self.fileService.listenForKeystroke)
+        self.ui.mediaDisplay.setFileService(self.fileService)
+        self.ui.mediaDisplay.setChildren(self.ui.imageGallery, self.ui.videoPlayer, self.ui.alertFrame)
+        self.ui.mediaDisplay.mediaLoaded.connect(self.fileService.listenForKeystroke)
        
         # Add right panel
         self.ui.rightPanel = RightPanel(self, self.fileService)

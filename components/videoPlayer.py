@@ -52,7 +52,6 @@ class VideoPlayer(QWidget):
         self.setLayout(layout)
 
     def setFile(self, file: str):
-        print("Setting file to", file)
         self.videoFile = QUrl.fromLocalFile(file)
         self.mediaPlayer.setSource(self.videoFile)
         self.progressBar.setValue(0)
