@@ -101,7 +101,7 @@
            <item>
             <widget class="QLabel" name="alertLabel">
              <property name="text">
-              <string>Select a source folder to begin</string>
+              <string>Select a source folder to begin, or press H for help</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
