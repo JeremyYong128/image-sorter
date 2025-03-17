@@ -1,0 +1,7 @@
+/dist/
+/build/
+*.spec
+*.exe
+*.pyc
+__pycache__/
+/venv/
