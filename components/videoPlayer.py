@@ -1,8 +1,10 @@
+import os
+
 from PyQt6.QtCore import pyqtSignal, QUrl
 from PyQt6.QtGui import QIcon
 from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimediaWidgets import QVideoWidget
-from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QProgressBar, QPushButton, QSizePolicy, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QProgressBar, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
 
 class VideoPlayer(QWidget):
@@ -10,6 +12,8 @@ class VideoPlayer(QWidget):
 
     def __init__(self):
         super().__init__()
+
+        self.baseDir = QApplication.instance().baseDir
         
         self.videoFile = None
         self.currentPosition = 0
@@ -23,8 +27,8 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.durationChanged.connect(self.updateTotalDuration)
 
         self.controls = QFrame(self)
-        playIcon = QIcon("assets/play_icon.svg")
-        pauseIcon = QIcon("assets/pause_icon.svg")
+        playIcon = QIcon(os.path.join(self.baseDir, "assets", "play_icon.svg"))
+        pauseIcon = QIcon(os.path.join(self.baseDir, "assets", "pause_icon.svg"))
         self.playButton = QPushButton(self.controls)
         self.pauseButton = QPushButton(self.controls)
         self.playButton.setIcon(playIcon)

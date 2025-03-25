@@ -8,7 +8,7 @@ from services.fileService import FileService
 from ui.ui_mainWindow import Ui_MainWindow
 
 class MainWindow(QMainWindow):
-    def __init__(self, ui_file: str):
+    def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
