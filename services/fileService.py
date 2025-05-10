@@ -69,7 +69,7 @@ class FileService(QObject):
 
     def isImageFile(self, file: str):
         ext = file.split(".")[-1].lower()
-        return ext in ["jpg", "png"]
+        return ext in ["jpg", "png", "jpeg"]
     
     def isVideoFile(self, file: str):
         ext = file.split(".")[-1].lower()
