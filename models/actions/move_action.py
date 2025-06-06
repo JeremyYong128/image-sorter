@@ -1,11 +1,11 @@
 import os
 
-from action import Action
+from models.actions.action import Action
 
 class MoveAction(Action):
-    def __init__(self, inputFile: str, inputFolder: str, outputFolder: str):
-        self.inputFile = inputFile
+    def __init__(self, inputFolder: str, inputFile: str, outputFolder: str):
         self.inputFolder = inputFolder
+        self.inputFile = inputFile
         self.outputFolder = outputFolder
 
     def execute(self):
@@ -14,10 +14,13 @@ class MoveAction(Action):
             destination = os.path.join(self.outputFolder, self.inputFile)
             if os.path.exists(destination):
                 copyNumber = 0
-                basename, ext = os.path.splitext(self.destination)
-                while os.path.exists(self.destination):
+                basename, ext = os.path.splitext(destination)
+                while os.path.exists(destination):
                     copyNumber += 1
-                    self.destination = os.path.join(basename + " (" + str(copyNumber) + ")" + ext)
+                    destination = os.path.join(basename + " (" + str(copyNumber) + ")" + ext)
+                self.destination = destination
+            else:
+                self.destination = destination
             os.rename(source, self.destination)
             return "Moved " + self.inputFile + " to " + self.outputFolder
         return False   

@@ -2,7 +2,7 @@ import os
 
 from send2trash import send2trash
 
-from action import Action
+from models.actions.action import Action
 
 class DeleteAction(Action):
     def __init__(self, inputFolder: str, inputFile: str):

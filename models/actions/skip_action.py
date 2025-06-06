@@ -1,6 +1,6 @@
 import os
 
-from action import Action
+from models.actions.action import Action
 
 class SkipAction(Action):
     def __init__(self, inputFolder: str, inputFile: str, skippedFilesList: set):

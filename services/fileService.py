@@ -107,7 +107,6 @@ class FileService(QObject):
         if self.inputFile:
             moveAction = MoveAction(self.inputFolder, self.inputFile, outputFolder)
             response = moveAction.execute()
-            self.actionList.append(moveAction)
             if response:
                 self.consoleService.print(response)
         self.setInputFile()
