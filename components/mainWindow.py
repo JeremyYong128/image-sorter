@@ -1,4 +1,3 @@
-from PyQt6 import uic
 from PyQt6.QtCore import QEvent, QObject, Qt
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
@@ -60,13 +59,15 @@ class KeyPressFilter(QObject):
             e.accept()
             return True
         if e.type() == QEvent.Type.KeyPress:
+            # if e.key() == Qt.Key.Key_Z and e.modifiers() == Qt.KeyboardModifier.ControlModifier:
+            #     self.fileService.undoDelete()
             if e.key() == Qt.Key.Key_H:
                 self.messageBox.exec()
             if e.key() == Qt.Key.Key_Space:
                 self.fileService.handleKeyPress("Space")
             if e.key() == Qt.Key.Key_Backspace:
                 self.fileService.handleKeyPress("Backspace")
-            else:
+            elif e.key() not in (Qt.Key.Key_Control, Qt.Key.Key_Meta):
                 key = e.text()
                 self.fileService.handleKeyPress(key)
         return super().eventFilter(obj, e)

@@ -1,7 +1,12 @@
+from collections import deque
 import os
-from send2trash import send2trash
+import shutil
+
 from PyQt6.QtCore import pyqtSignal, QObject
 
+from models.actions.move_action import MoveAction
+from models.actions.skip_action import SkipAction
+from models.actions.delete_action import DeleteAction
 from services.consoleService import ConsoleService
 
 class FileService(QObject):
@@ -21,6 +26,7 @@ class FileService(QObject):
         self.outputKeys = []
         self.skippedFiles = set()
         self.listeningForKeystroke = True
+        # self.actionList = deque(maxlen=10)
     
     def setInputFolder(self, folder: str):
         self.inputFolder = folder
@@ -87,33 +93,47 @@ class FileService(QObject):
         if self.listeningForKeystroke:
             self.listeningForKeystroke = False
             if key in self.outputKeys:
-                index = self.outputKeys.index(key)
-                outputFolder = self.outputFolders[index]
-                source = os.path.join(self.inputFolder, self.inputFile)
-                if os.path.exists(source) and self.inputFile:
-                    destination = os.path.join(outputFolder, os.path.basename(self.inputFile))
-                    if os.path.exists(destination):
-                        copyNumber = 0
-                        basename, ext = os.path.splitext(destination)
-                        while os.path.exists(destination):
-                            copyNumber += 1
-                            destination = os.path.join(outputFolder, basename + " (" + str(copyNumber) + ")" + ext)
-                    os.rename(source, destination)
-                    self.consoleService.print("Moved " + self.inputFile + " to " + outputFolder)
-                    self.setInputFile()
+                self.moveFile(key)
             elif key == "Space":
-                if os.path.exists(os.path.join(self.inputFolder, self.inputFile)) and self.inputFile:
-                    self.skippedFiles.add(self.inputFile)
-                    self.consoleService.print("Skipped " + self.inputFile)
-                self.setInputFile()
+                self.skipFile()
             elif key == "Backspace":
-                source = os.path.join(self.inputFolder, self.inputFile)
-                if os.path.exists(source) and self.inputFile:
-                    send2trash(source)
-                    self.consoleService.print("Deleted " + self.inputFile)
-                self.setInputFile()
+                self.deleteFile()
             else:
                 self.listeningForKeystroke = True
+
+    def moveFile(self, key: str):
+        index = self.outputKeys.index(key)
+        outputFolder = self.outputFolders[index]
+        if self.inputFile:
+            moveAction = MoveAction(self.inputFolder, self.inputFile, outputFolder)
+            response = moveAction.execute()
+            self.actionList.append(moveAction)
+            if response:
+                self.consoleService.print(response)
+        self.setInputFile()
+
+    def skipFile(self):
+        if self.inputFile:
+            response = SkipAction(self.inputFolder, self.inputFile, self.skippedFiles).execute()
+            if response:
+                self.consoleService.print(response)
+        self.setInputFile()
+
+    def deleteFile(self):
+        if self.inputFile:
+            response = DeleteAction(self.inputFolder, self.inputFile).execute()
+            if response:
+                self.consoleService.print(response)
+        self.setInputFile()
+
+    # def undoDelete(self):
+    #     if self.lastDeletedFile:
+    #         source = os.path.expanduser(f"~/.Trash/{self.lastDeletedFile}")
+    #         if os.path.exists(source):
+    #             destination = os.path.join(self.inputFolder, self.lastDeletedFile)
+    #             shutil.move(source, destination)
+    #     else:
+    #         self.consoleService.print("No file to restore")
 
     def resetSkippedFiles(self):
         self.skippedFiles = set()

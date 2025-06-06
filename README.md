@@ -1,6 +1,6 @@
 # Image Sorter
 
-A simple app to sort images more quickly than dragging and dropping. Currently only supports command-line startup.
+A simple app to sort images more quickly than dragging and dropping. Currently only supports command-line startup and MacOS (recovering file from trash only implemented on Mac).
 
 To get started, a Python installation is required. Then, run the following commands:
 
@@ -18,4 +18,3 @@ python app.py
 Several ideas for additional features:
 
 * Packaging into DMG/exe applications
-* Adding undo command
