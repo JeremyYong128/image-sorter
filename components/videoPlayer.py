@@ -6,6 +6,7 @@ from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QProgressBar, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
+from components.progressBar import ProgressBar
 
 class VideoPlayer(QWidget):
     videoLoaded = pyqtSignal()
@@ -37,7 +38,8 @@ class VideoPlayer(QWidget):
         self.pauseButton.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         self.playButton.clicked.connect(self.mediaPlayer.play)
         self.pauseButton.clicked.connect(self.mediaPlayer.pause)
-        self.progressBar = QProgressBar(self.controls)
+        self.progressBar = ProgressBar(self.controls)
+        self.progressBar.seekLocation.connect(self.seekLocation)
         self.timestamp = QLabel("0:00 / 0:00", self.controls)
         
         controlsLayout = QHBoxLayout()
@@ -75,6 +77,13 @@ class VideoPlayer(QWidget):
 
     def formatTime(self, seconds: int):
         return f"{seconds // 600}:{((seconds % 600) // 10):02d}"
+    
+    def seekLocation(self, ratio: float):
+        newPosition = int(ratio * self.totalDuration)
+        print(newPosition)
+        print(self.totalDuration)
+        self.mediaPlayer.setPosition(newPosition * 100)
+        self.updateCurrentPosition(newPosition)
     
     def updateProgressBar(self):
         self.progressBar.setMaximum(self.totalDuration)
