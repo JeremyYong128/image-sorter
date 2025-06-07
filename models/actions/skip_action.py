@@ -12,8 +12,12 @@ class SkipAction(Action):
         source = os.path.join(self.inputFolder, self.inputFile)
         if os.path.exists(source):
             self.skippedFilesList.add(self.inputFile)
-            return "Skipped " + self.inputFile
+            return f"Skipped {self.inputFile}"
         return False
 
     def undo(self):
-        pass
+        source = os.path.join(self.inputFolder, self.inputFile)
+        if os.path.exists(source) and self.inputFile in self.skippedFilesList:
+            self.skippedFilesList.remove(self.inputFile)
+            return f"Removed {self.inputFile} from skipped files"
+        return False

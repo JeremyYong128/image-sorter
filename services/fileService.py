@@ -1,12 +1,12 @@
 from collections import deque
 import os
-import shutil
 
 from PyQt6.QtCore import pyqtSignal, QObject
 
+from models.actions.action import Action
+from models.actions.delete_action import DeleteAction
 from models.actions.move_action import MoveAction
 from models.actions.skip_action import SkipAction
-from models.actions.delete_action import DeleteAction
 from services.consoleService import ConsoleService
 
 class FileService(QObject):
@@ -26,15 +26,15 @@ class FileService(QObject):
         self.outputKeys = []
         self.skippedFiles = set()
         self.listeningForKeystroke = True
-        # self.actionList = deque(maxlen=10)
+        self.actionList: deque[Action] = deque(maxlen=10)
     
     def setInputFolder(self, folder: str):
         self.inputFolder = folder
         self.inputFolderChanged.emit(folder)
         self.resetSkippedFiles()
-        self.setInputFile()
+        self.updateInputFile()
 
-    def setInputFile(self):
+    def updateInputFile(self):
         if self.inputFolder:
             media = [file for file in os.listdir(self.inputFolder) if (self.isImageFile(file) or self.isVideoFile(file)) and file not in self.skippedFiles]
             if len(media) != 0:
@@ -108,31 +108,35 @@ class FileService(QObject):
             moveAction = MoveAction(self.inputFolder, self.inputFile, outputFolder)
             response = moveAction.execute()
             if response:
+                self.actionList.append(moveAction)
                 self.consoleService.print(response)
-        self.setInputFile()
+        self.updateInputFile()
 
     def skipFile(self):
         if self.inputFile:
-            response = SkipAction(self.inputFolder, self.inputFile, self.skippedFiles).execute()
+            skipAction = SkipAction(self.inputFolder, self.inputFile, self.skippedFiles)
+            response = skipAction.execute()
             if response:
+                self.actionList.append(skipAction)
                 self.consoleService.print(response)
-        self.setInputFile()
+        self.updateInputFile()
 
     def deleteFile(self):
         if self.inputFile:
-            response = DeleteAction(self.inputFolder, self.inputFile).execute()
+            deleteAction = DeleteAction(self.inputFolder, self.inputFile)
+            response = deleteAction.execute()
+            if response:
+                self.actionList.append(deleteAction)
+                self.consoleService.print(response)
+        self.updateInputFile()
+
+    def undo(self):
+        if self.actionList:
+            action = self.actionList.pop()
+            response = action.undo()
             if response:
                 self.consoleService.print(response)
-        self.setInputFile()
-
-    # def undoDelete(self):
-    #     if self.lastDeletedFile:
-    #         source = os.path.expanduser(f"~/.Trash/{self.lastDeletedFile}")
-    #         if os.path.exists(source):
-    #             destination = os.path.join(self.inputFolder, self.lastDeletedFile)
-    #             shutil.move(source, destination)
-    #     else:
-    #         self.consoleService.print("No file to restore")
+        self.updateInputFile()
 
     def resetSkippedFiles(self):
         self.skippedFiles = set()

@@ -59,8 +59,8 @@ class KeyPressFilter(QObject):
             e.accept()
             return True
         if e.type() == QEvent.Type.KeyPress:
-            # if e.key() == Qt.Key.Key_Z and e.modifiers() == Qt.KeyboardModifier.ControlModifier:
-            #     self.fileService.undoDelete()
+            if e.key() == Qt.Key.Key_Z and e.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                self.fileService.undo()
             if e.key() == Qt.Key.Key_H:
                 self.messageBox.exec()
             if e.key() == Qt.Key.Key_Space:
